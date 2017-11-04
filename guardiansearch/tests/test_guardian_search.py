@@ -29,3 +29,13 @@ class TestGuardianSearch(unittest.TestCase):
         expected_formatted = ""
         formatted_results = guardianapi.format_results({})
         self.assertEqual(expected_formatted, formatted_results)
+
+    def test_get_search_results(self):
+        # Verify that if there are multiple pages all results are returned
+        expected_results = ""
+        received_results = guardianapi.get_search_results(
+            query="foo bar",
+            from_date="2012-06-06",
+            to_date="2014-06-06",
+        )
+        self.assertEqual(expected_results, received_results)

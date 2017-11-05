@@ -38,13 +38,23 @@ class TestGuardianSearch(unittest.TestCase):
             self.assertEqual(expected_json, result_json)
 
     def test_get_result_json_not_ok(self):
-        # Have to mock the result of requests.get
-        expected_json = {}
-        result_json = guardianapi.get_result_json(
-            api_key=os.environ['API_KEY'],
-            query="foo bar",
-        )
-        self.assertEqual(expected_json, result_json)
+        # Verify that error message is returned when get fails
+        expected_result = "error"
+        with mock.patch('requests.get') as requests_get:
+            requests_get.return_value.ok = False
+            requests_get.return_value.text = "error"
+            result = guardianapi.get_result_json(
+                api_key=os.environ['API_KEY'],
+                query="foo bar",
+            )
+            requests_get.assert_called_once_with(
+                guardianapi.GUARDIAN_API,
+                params={
+                    'api-key': os.environ['API_KEY'],
+                    'q': 'foo bar'
+                }
+            )
+            self.assertEqual(expected_result, result)
 
     def test_format_results(self):
         # Verify that results are formatted correctly
